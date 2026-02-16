@@ -1,10 +1,6 @@
 package dao;
 
 import exception.DataProcessingException;
-import mate.academy.lib.Dao;
-import model.Book;
-import util.ConnectionUtil;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +9,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import mate.academy.lib.Dao;
+import model.Book;
+import util.ConnectionUtil;
 
 @Dao
 public class BookDaoImpl implements BookDao {
@@ -21,7 +20,8 @@ public class BookDaoImpl implements BookDao {
     public Book create(Book book) {
         String query = "INSERT INTO books (title, price) VALUES (?, ?)";
         try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement statement = connection.prepareStatement(query,
+                     Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, book.getTitle());
             statement.setBigDecimal(2, book.getPrice());
@@ -107,13 +107,13 @@ public class BookDaoImpl implements BookDao {
     public boolean deleteById(Long id) {
         String query = "DELETE FROM books WHERE id = ?";
         try (Connection connection = ConnectionUtil.getConnection();
-        PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setLong(1, id);
 
             int affectedRows = statement.executeUpdate();
 
-                    return affectedRows > 0;
+            return affectedRows > 0;
         } catch (SQLException e) {
             throw new DataProcessingException("Can't delete book by id: " + id, e);
         }
