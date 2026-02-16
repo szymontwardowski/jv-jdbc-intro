@@ -1,23 +1,36 @@
-package mate.academy;
-
 import dao.BookDao;
-import java.math.BigDecimal;
 import mate.academy.lib.Injector;
 import model.Book;
 
-public class Main {
-    public static void main(String[] args) {
-        Injector injector = Injector.getInstance("mate.academy");
+import java.math.BigDecimal;
 
-        BookDao bookDao = (BookDao) injector.getInstance(BookDao.class);
+public static void main(String[] args) {
+    Injector injector = Injector.getInstance("mate.academy");
+    BookDao bookDao = (BookDao) injector.getInstance(BookDao.class);
 
-        Book myBook = new Book();
-        myBook.setTitle("Wyprawa w Tatry");
-        myBook.setPrice(BigDecimal.valueOf(49.99));
+    // 1. CREATE
+    Book book = new Book();
+    book.setTitle("Wyprawa w Tatry");
+    book.setPrice(BigDecimal.valueOf(49.99));
+    bookDao.create(book);
+    System.out.println("Utworzono: " + book);
 
-        Book savedBook = bookDao.create(myBook);
-        System.out.println("Zapisano książkę z ID: " + savedBook.getId());
+    // 2. FIND BY ID
+    Book foundBook = bookDao.findById(book.getId()).orElseThrow(
+            () -> new RuntimeException("Nie znaleziono książki o ID: " + book.getId())
+    );
+    System.out.println("Znaleziono: " + foundBook);
 
-        System.out.println("Wszystkie książki: " + bookDao.findAll());
-    }
+    // 3. UPDATE
+    foundBook.setTitle("Wyprawa w Tatry - Wydanie II");
+    bookDao.update(foundBook);
+    System.out.println("Zaktualizowano: " + bookDao.findById(book.getId()).get());
+
+    // 4. FIND ALL
+    System.out.println("Liczba wszystkich książek: " + bookDao.findAll().size());
+
+    // 5. DELETE
+    boolean isDeleted = bookDao.deleteById(book.getId());
+    System.out.println("Czy usunięto? " + isDeleted);
+    System.out.println("Czy nadal istnieje? " + bookDao.findById(book.getId()).isPresent());
 }
